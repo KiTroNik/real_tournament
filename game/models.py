@@ -14,7 +14,7 @@ class Game(models.Model):
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     game = models.ForeignKey(
-        Game, related_name='player', on_delete=models.DO_NOTHING, blank=True, null=True)
+        Game, related_name='player', on_delete=models.SET_NULL, blank=True, null=True)
     points = models.IntegerField(default=0)
     is_creator = models.BooleanField(default=False)
 
