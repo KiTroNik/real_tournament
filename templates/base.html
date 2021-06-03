@@ -32,7 +32,8 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     {% if request.user.is_authenticated %}
-                        <li><a href="/lobby/">Lobby</a></li>
+                        <li><a href="/create_room/">Create Game</a></li>
+                        <li><a href="/join_room/">Join Game</a></li>
                         <li><a href="/logout/">Logout</a></li>
                     {% else %}
                         <li><a href="/signup/">Register</a></li>

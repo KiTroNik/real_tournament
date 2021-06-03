@@ -1,0 +1,51 @@
+{% extends "base.html" %} 
+ 
+{% block main_content %}
+<div class="row">
+    <div class="col-lg-12">
+        <h3>Witaj w poczekalni</h3>
+        <p>Liczba graczy: </p>
+        <p id="number_of_players"></p>
+        {% if request.user.player.is_creator %}
+            <input id="start_game" type="button" value="Start">
+        {% endif %}
+    </div>
+</div>
+
+{{ room_name|json_script:"room-name" }}
+<script>
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+    const lobbySocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/lobby/'
+        + roomName
+        + '/'
+    );
+
+    lobbySocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log(data['message'])
+        document.querySelector('#number_of_players').innerHTML = data['message'];
+    };
+
+    lobbySocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#start_game').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#start_game').click();
+        }
+    };
+
+    document.querySelector('#start_game').onclick = function(e) {
+        lobbySocket.send(JSON.stringify({
+            'message': {
+                'event': 'start',
+            }
+        }));
+    };
+</script>
+{% endblock %}
