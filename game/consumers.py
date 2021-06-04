@@ -33,6 +33,8 @@ class LobbyConsumer(WebsocketConsumer):
         if self.user.player.is_creator:
             game = Game.objects.filter(room_name=self.room_name)[0]
             game.delete()
+
+            self.user.player.game = None
             self.user.player.points = 0
             self.user.player.is_creator = False
             self.user.player.save()

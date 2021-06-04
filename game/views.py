@@ -42,9 +42,9 @@ def create_room(request, room_name):
 
 @login_required
 def join_room(request, room_name):
-    game = Game.objects.filter(room_name=room_name)[0]
+    game = Game.objects.filter(room_name=room_name)
     if game:
-        request.user.player.game = game
+        request.user.player.game = game[0]
         request.user.player.save()
 
         return render(request, 'game/lobby.html', {'room_name': room_name})
