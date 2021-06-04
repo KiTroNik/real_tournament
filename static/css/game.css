@@ -46,12 +46,12 @@ table{
   border:2px solid #3b3a6e;
 
 }
+
 table td {
   position:relative;
   border:1px solid #3b3a6e;
 
 }
-
 
 .player-line{
    font-size:20px;
@@ -67,7 +67,6 @@ table td {
     font-size: 10px;
   color: rgb(120, 120, 200);
 }
-
 
 .player-badge{
   display:block;
