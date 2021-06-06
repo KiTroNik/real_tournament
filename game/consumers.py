@@ -10,6 +10,9 @@ class LobbyConsumer(WebsocketConsumer):
         self.room_group_name = 'game_%s' % self.room_name
         self.user = self.scope['user']
 
+        self.user.player.in_game = True
+        self.user.player.save()
+
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
@@ -44,6 +47,7 @@ class LobbyConsumer(WebsocketConsumer):
             self.user.player.game = None
             self.user.player.points = 0
             self.user.player.is_creator = False
+            self.user.player.in_game = False
             self.user.player.save()
 
             message = 'exit'
@@ -58,6 +62,7 @@ class LobbyConsumer(WebsocketConsumer):
         else:
             self.user.player.game = None
             self.user.player.points = 0
+            self.user.player.in_game = False
             self.user.player.save()
 
             message = Player.objects.filter(game__room_name=self.room_name).count()
@@ -105,10 +110,49 @@ class LobbyConsumer(WebsocketConsumer):
 
 class GameConsumer(WebsocketConsumer):
     def connect(self):
-        pass
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.room_group_name = 'game_%s' % self.room_name
+        self.user = self.scope['user']
+
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        self.accept()
 
     def disconnect(self, close_code):
-        pass
+        # remove from game and send to socket and if creator remove game
+        if self.user.player.is_creator:
+            game = Game.objects.filter(room_name=self.room_name)[0]
+            game.delete()
+
+            self.user.player.game = None
+            self.user.player.points = 0
+            self.user.player.is_creator = False
+            self.user.player.in_game = False
+            self.user.player.save()
+
+            message = 'exit'
+
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message
+                }
+            )
+        else:
+            self.user.player.game = None
+            self.user.player.in_game = False
+            self.user.player.points = 0
+            self.user.player.save()
+
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
 
     # Receive message from WebSocket (possible: start game)
     def receive(self, text_data):

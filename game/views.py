@@ -55,7 +55,7 @@ def join_room(request, room_name):
 @login_required
 def start_game(request, room_name):
     game = Game.objects.filter(room_name=room_name)
-    if game and game[0].started:
+    if game and game[0].started and request.user.player.in_game:
         return render(request, 'game/game.html', {'room_name': room_name})
     else:
         return redirect('/')

@@ -17,6 +17,7 @@ class Player(models.Model):
         Game, related_name='player', on_delete=models.SET_NULL, blank=True, null=True)
     points = models.IntegerField(default=0)
     is_creator = models.BooleanField(default=False)
+    in_game = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
