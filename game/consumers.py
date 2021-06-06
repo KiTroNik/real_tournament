@@ -161,6 +161,7 @@ class GameConsumer(WebsocketConsumer):
             self.channel_name
         )
 
+    # next question, add_point i wysyla change_question lub results
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         client_message = text_data_json['message']['event']

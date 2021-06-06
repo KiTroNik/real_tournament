@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import reverse, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from .models import Game, Player
 
@@ -30,6 +31,10 @@ class JoinRoomView(LoginRequiredMixin, TemplateView):
 # Create game and set current user as creator
 @login_required
 def create_room(request, room_name):
+    if Game.objects.filter(room_name=room_name):
+        messages.error(request, 'Game with this name already exists. Try differrent name.')
+        return redirect('game:join_room')
+
     game = Game(creator=request.user, room_name=room_name)
     game.save()
 
