@@ -4,20 +4,20 @@
 {% block main_content %}
 <div class="row">
     <div class="col-lg-12">
-        <h1 id="question"></h1>
-        <p id="first"></p>
-        <p id="second"></p>
-        <p id="third"></p>
-        <p id="fourth"></p>
-        <p>TU BEDA PIERDOLONE SKURWYSYNSKIE PY TA NIA!!</p>
+        <h1 id="question">Przygotuj się na pierwsze pytanie i zapoznaj się z interfejsem.</h1>
+        <p id="first">Tu będzie pierwsza odpowiedź</p>
+        <p id="second">Tu będzie druga odpowiedź</p>
+        <p id="third">Tu będzie trzecia odpowiedź</p>
+        <p id="fourth">Tu będzie czwarta odpowiedź</p>
         {% if request.user.player.is_creator %}
             <input id="next" type="button" value="Next question">
         {% endif %}
+        <p id="righ_answer"></p>
     </div>
 </div>
 
 {{ room_name|json_script:"room-name" }}
-<script>
+<script charset="utf-8">
     const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
     const lobbySocket = new WebSocket(
@@ -30,8 +30,15 @@
 
     lobbySocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-        if (data['message'] === 'exit') {
+        if (data['message']['event'] === 'exit') {
             window.location.replace('/');
+        } else if (data['message']['event'] === 'change_question') {
+            let question_json = JSON.parse(data['message']['data'])
+            document.querySelector('#question').innerHTML = question_json[0]['title'];
+            document.querySelector('#first').innerHTML = question_json[0]['answer'][0]['answer_text'];
+            document.querySelector('#second').innerHTML = question_json[0]['answer'][1]['answer_text'];
+            document.querySelector('#third').innerHTML = question_json[0]['answer'][2]['answer_text'];
+            document.querySelector('#fourth').innerHTML = question_json[0]['answer'][3]['answer_text'];
         }
     };
 
@@ -48,7 +55,8 @@
     document.querySelector('#next').onclick = function(e) {
         lobbySocket.send(JSON.stringify({
             'message': {
-                'event': 'start',
+                'event': 'next_question',
+                'data': '',
             }
         }));
     };

@@ -1,7 +1,11 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from rest_framework.renderers import JSONRenderer
 from .models import Player, Game
+
+from quiz.models import Question
+from quiz.serializers import RandomQuestionSerializer
 
 
 class LobbyConsumer(WebsocketConsumer):
@@ -134,7 +138,10 @@ class GameConsumer(WebsocketConsumer):
             self.user.player.in_game = False
             self.user.player.save()
 
-            message = 'exit'
+            message = {
+                'event': 'exit',
+                'data': ''
+            }
 
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -156,7 +163,24 @@ class GameConsumer(WebsocketConsumer):
 
     # Receive message from WebSocket (possible: start game)
     def receive(self, text_data):
-        pass
+        text_data_json = json.loads(text_data)
+        client_message = text_data_json['message']['event']
+
+        if client_message == 'next_question' and self.user.player.is_creator:
+            question = Question.objects.all().order_by('?')[:1]
+            serializer = RandomQuestionSerializer(question, many=True)
+            data = json.dumps(serializer.data)
+            message = {
+                'event': 'change_question',
+                'data': data
+            }
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message
+                }
+            )
 
     # Receive message from room group
     def chat_message(self, event):
