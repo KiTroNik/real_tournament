@@ -1,14 +1,17 @@
 {% extends "base.html" %}
 {% load static %}
- 
+
 {% block main_content %}
 <div class="row">
     <div class="col-lg-12">
-        <h3>Witaj w poczekalni</h3>
-        <p>Liczba graczy: </p>
-        <p id="number_of_players"></p>
+        <h1 id="question"></h1>
+        <p id="first"></p>
+        <p id="second"></p>
+        <p id="third"></p>
+        <p id="fourth"></p>
+        <p>TU BEDA PIERDOLONE SKURWYSYNSKIE PY TA NIA!!</p>
         {% if request.user.player.is_creator %}
-            <input id="start_game" type="button" value="Start">
+            <input id="next" type="button" value="Next question">
         {% endif %}
     </div>
 </div>
@@ -20,7 +23,7 @@
     const lobbySocket = new WebSocket(
         'ws://'
         + window.location.host
-        + '/ws/lobby/'
+        + '/ws/game/'
         + roomName
         + '/'
     );

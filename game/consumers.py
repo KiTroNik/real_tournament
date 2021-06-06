@@ -29,6 +29,10 @@ class LobbyConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
+        # If game started do nothing
+        if self.user.player.game.started:
+            return
+
         # remove from game and send to socket and if creator remove game
         if self.user.player.is_creator:
             game = Game.objects.filter(room_name=self.room_name)[0]
@@ -68,7 +72,42 @@ class LobbyConsumer(WebsocketConsumer):
             self.channel_name
         )
 
-    # Receive message from WebSocket
+    # Receive message from WebSocket (possible: start game)
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        client_message = text_data_json['message']['event']
+
+        if client_message == 'start' and self.user.player.is_creator:
+            self.user.player.game.started = True
+            self.user.player.game.save()
+
+            message = 'start_game'
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message
+                }
+            )
+
+    # Receive message from room group
+    def chat_message(self, event):
+        message = event['message']
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            'message': message
+        }))
+
+
+class GameConsumer(WebsocketConsumer):
+    def connect(self):
+        pass
+
+    def disconnect(self, close_code):
+        pass
+
+    # Receive message from WebSocket (possible: start game)
     def receive(self, text_data):
         pass
 

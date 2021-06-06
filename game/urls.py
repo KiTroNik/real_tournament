@@ -12,5 +12,6 @@ urlpatterns = [
     path('create_room/', CreateRoomView.as_view(), name='create_room'),
     path('join_room/', JoinRoomView.as_view(), name='join_room'),
     path('create/<str:room_name>/', views.create_room, name='create'),
+    path('game/<str:room_name>/', views.start_game, name='start'),
     path('<str:room_name>/', views.join_room, name='join'),
 ]
