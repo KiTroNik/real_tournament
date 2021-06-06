@@ -29,8 +29,11 @@ class LobbyConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
-        # If game started do nothing
         if self.user.player.game.started:
+            async_to_sync(self.channel_layer.group_discard)(
+                self.room_group_name,
+                self.channel_name
+            )
             return
 
         # remove from game and send to socket and if creator remove game
