@@ -161,26 +161,28 @@ class GameConsumer(WebsocketConsumer):
             self.channel_name
         )
 
-    # Receive message from WebSocket (possible: start game)
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         client_message = text_data_json['message']['event']
 
         if client_message == 'next_question' and self.user.player.is_creator:
-            question = Question.objects.all().order_by('?')[:1]
-            serializer = RandomQuestionSerializer(question, many=True)
-            data = json.dumps(serializer.data)
-            message = {
-                'event': 'change_question',
-                'data': data
+            self.send_random_questions_to_players()
+
+    def send_random_questions_to_players(self):
+        question = Question.objects.all().order_by('?')[:1]
+        serializer = RandomQuestionSerializer(question, many=True)
+        data = json.dumps(serializer.data)
+        message = {
+            'event': 'change_question',
+            'data': data
+        }
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message
             }
-            async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
-                {
-                    'type': 'chat_message',
-                    'message': message
-                }
-            )
+        )
 
     # Receive message from room group
     def chat_message(self, event):
