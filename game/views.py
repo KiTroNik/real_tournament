@@ -13,6 +13,7 @@ class SignupView(CreateView):
     form_class = UserCreationForm
 
     def get_success_url(self):
+        messages.success(self.request, 'You have successfully signed up. Please log in.')
         return reverse('game:login')
 
 
@@ -33,7 +34,7 @@ class JoinRoomView(LoginRequiredMixin, TemplateView):
 def create_room(request, room_name):
     if Game.objects.filter(room_name=room_name):
         messages.error(request, 'Game with this name already exists. Try differrent name.')
-        return redirect('game:join_room')
+        return redirect('game:create_room')
 
     game = Game(creator=request.user, room_name=room_name)
     game.save()
@@ -54,7 +55,8 @@ def join_room(request, room_name):
 
         return render(request, 'game/lobby.html', {'room_name': room_name})
     else:
-        return redirect('/')
+        messages.error(request, "Game with this name don't exists")
+        return redirect('game:join_room')
 
 
 @login_required

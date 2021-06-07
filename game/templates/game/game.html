@@ -13,6 +13,7 @@
             <input id="next" type="button" value="Next question">
         {% endif %}
         <p id="righ_answer"></p>
+        <p id="creator_left"></p>
     </div>
 </div>
 
@@ -28,10 +29,12 @@
         + '/'
     );
 
+    let clicked = false;
+
     lobbySocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
         if (data['message']['event'] === 'exit') {
-            window.location.replace('/');
+            document.querySelector('#creator_left').innerHTML = 'Sorry the creator of the room have left the game. You can leave now.';
         } else if (data['message']['event'] === 'change_question') {
             let question_json = JSON.parse(data['message']['data'])
             document.querySelector('#question').innerHTML = question_json[0]['title'];
@@ -39,6 +42,7 @@
             document.querySelector('#second').innerHTML = question_json[0]['answer'][1]['answer_text'];
             document.querySelector('#third').innerHTML = question_json[0]['answer'][2]['answer_text'];
             document.querySelector('#fourth').innerHTML = question_json[0]['answer'][3]['answer_text'];
+            clicked = false;
         }
     };
 
