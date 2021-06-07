@@ -168,6 +168,8 @@ class GameConsumer(WebsocketConsumer):
 
         if client_message == 'next_question' and self.user.player.is_creator:
             self.send_random_questions_to_players()
+        elif client_message == 'add_point':
+            self.add_point()
 
     def send_random_questions_to_players(self):
         question = Question.objects.all().order_by('?')[:1]
@@ -177,6 +179,11 @@ class GameConsumer(WebsocketConsumer):
             'event': 'change_question',
             'data': data
         }
+
+        game = Game.objects.filter(room_name=self.room_name)[0]
+        game.question_number += 1
+        game.save()
+
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
@@ -184,6 +191,10 @@ class GameConsumer(WebsocketConsumer):
                 'message': message
             }
         )
+
+    def add_point(self):
+        self.user.player.points += 1
+        self.user.player.save()
 
     # Receive message from room group
     def chat_message(self, event):

@@ -12,7 +12,7 @@
         {% if request.user.player.is_creator %}
             <input id="next" type="button" value="Next question">
         {% endif %}
-        <p id="righ_answer"></p>
+        <p id="right_answer"></p>
         <p id="creator_left"></p>
     </div>
 </div>
@@ -29,8 +29,6 @@
         + '/'
     );
 
-    let clicked, first, second, third, fourth;
-    clicked = first = second = third = fourth = false;
     let answers;
 
     lobbySocket.onmessage = function(e) {
@@ -72,17 +70,30 @@
     }
 
     function checkAnswer(i, p) {
-        console.log(i, p);
         if (answers[i]['is_right']) {
             p.style.color = 'green';
+            lobbySocket.send(JSON.stringify({
+                'message': {
+                    'event': 'add_point',
+                    'data': '',
+                }
+            }));
         } else {
             p.style.color = 'red';
         }
+
+        for (let j = 0; j < 4; j++) {
+            if (answers[j]['is_right']) {
+                document.querySelector('#right_answer').innerHTML = 'Prawidłowa odpowiedź: ' + answers[j]['answer_text'];
+            }
+        }
+
         disableQuestions();
     }
 
     function resetStyle() {
         document.querySelectorAll('.answer').forEach(el => {el.style.color = 'black';})
+        document.querySelector('#right_answer').innerHTML = '';
     }
 
 </script>
