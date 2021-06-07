@@ -5,10 +5,10 @@
 <div class="row">
     <div class="col-lg-12">
         <h1 id="question">Przygotuj się na pierwsze pytanie i zapoznaj się z interfejsem.</h1>
-        <p id="first">Tu będzie pierwsza odpowiedź</p>
-        <p id="second">Tu będzie druga odpowiedź</p>
-        <p id="third">Tu będzie trzecia odpowiedź</p>
-        <p id="fourth">Tu będzie czwarta odpowiedź</p>
+        <p class="answer" id="first">Tu będzie pierwsza odpowiedź</p>
+        <p class="answer" id="second">Tu będzie druga odpowiedź</p>
+        <p class="answer" id="third">Tu będzie trzecia odpowiedź</p>
+        <p class="answer" id="fourth">Tu będzie czwarta odpowiedź</p>
         {% if request.user.player.is_creator %}
             <input id="next" type="button" value="Next question">
         {% endif %}
@@ -29,7 +29,9 @@
         + '/'
     );
 
-    let clicked = false;
+    let clicked, first, second, third, fourth;
+    clicked = first = second = third = fourth = false;
+    let answers;
 
     lobbySocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
@@ -37,23 +39,19 @@
             document.querySelector('#creator_left').innerHTML = 'Sorry the creator of the room have left the game. You can leave now.';
         } else if (data['message']['event'] === 'change_question') {
             let question_json = JSON.parse(data['message']['data'])
+            answers = question_json[0]['answer'];
             document.querySelector('#question').innerHTML = question_json[0]['title'];
             document.querySelector('#first').innerHTML = question_json[0]['answer'][0]['answer_text'];
             document.querySelector('#second').innerHTML = question_json[0]['answer'][1]['answer_text'];
             document.querySelector('#third').innerHTML = question_json[0]['answer'][2]['answer_text'];
             document.querySelector('#fourth').innerHTML = question_json[0]['answer'][3]['answer_text'];
-            clicked = false;
+            enableQuestions();
+            resetStyle();
         }
     };
 
     lobbySocket.onclose = function(e) {
         console.error('Chat socket closed unexpectedly');
-    };
-
-    document.querySelector('#next').onkeyup = function(e) {
-        if (e.keyCode === 13) {
-                document.querySelector('#next').click();
-        }
     };
 
     document.querySelector('#next').onclick = function(e) {
@@ -64,5 +62,28 @@
             }
         }));
     };
+
+    function disableQuestions() {
+        document.querySelectorAll('.answer').forEach(el => {el.onclick = false;})
+    }
+
+    function enableQuestions() {
+        document.querySelectorAll('.answer').forEach((el, i) => {el.onclick = () => checkAnswer(i, el);})
+    }
+
+    function checkAnswer(i, p) {
+        console.log(i, p);
+        if (answers[i]['is_right']) {
+            p.style.color = 'green';
+        } else {
+            p.style.color = 'red';
+        }
+        disableQuestions();
+    }
+
+    function resetStyle() {
+        document.querySelectorAll('.answer').forEach(el => {el.style.color = 'black';})
+    }
+
 </script>
 {% endblock %}
