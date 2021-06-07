@@ -14,10 +14,9 @@ const roomName = JSON.parse(document.getElementById('room-name').textContent);
             document.querySelector('#number_of_players').innerHTML = 'Twórca pokoju wyszedł z gry. Stwórz własną lub dołącz do istniejącej';
         } else if (data['message'] === 'start_game') {
             window.location.replace('http://127.0.0.1:8000/game/' + roomName);
-            document.querySelector('#number_of_players').innerHTML = 'kurwaa jebana';
-        }//} else {
-        //    document.querySelector('#number_of_players').innerHTML = data['message'];
-       // }
+        } else {
+            document.querySelector('#number_of_players').innerHTML = data['message'];
+        }
     };
 
     lobbySocket.onclose = function(e) {
