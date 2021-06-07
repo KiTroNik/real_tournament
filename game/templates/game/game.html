@@ -5,6 +5,7 @@
 <div class="row">
     <div class="col-lg-12">
         <h1 id="question">Przygotuj się na pierwsze pytanie i zapoznaj się z interfejsem.</h1>
+        <div id="results"></div>
         <p class="answer" id="first">Tu będzie pierwsza odpowiedź</p>
         <p class="answer" id="second">Tu będzie druga odpowiedź</p>
         <p class="answer" id="third">Tu będzie trzecia odpowiedź</p>
@@ -36,7 +37,7 @@
         if (data['message']['event'] === 'exit') {
             document.querySelector('#creator_left').innerHTML = 'Sorry the creator of the room have left the game. You can leave now.';
         } else if (data['message']['event'] === 'change_question') {
-            let question_json = JSON.parse(data['message']['data'])
+            let question_json = JSON.parse(data['message']['data']);
             answers = question_json[0]['answer'];
             document.querySelector('#question').innerHTML = question_json[0]['title'];
             document.querySelector('#first').innerHTML = question_json[0]['answer'][0]['answer_text'];
@@ -45,6 +46,23 @@
             document.querySelector('#fourth').innerHTML = question_json[0]['answer'][3]['answer_text'];
             enableQuestions();
             resetStyle();
+        } else if (data['message']['event'] === 'show_results') {
+            let results_json = JSON.parse(data['message']['data']);
+            document.querySelector('#question').innerHTML = 'WYNIKI: ';
+            document.querySelector('#first').innerHTML = '';
+            document.querySelector('#second').innerHTML = '';
+            document.querySelector('#third').innerHTML = '';
+            document.querySelector('#fourth').innerHTML = '';
+            document.querySelector('#right_answer').innerHTML = '';
+
+            let ul = document.createElement('ul');
+            document.getElementById('results').appendChild(ul);
+            results_json.forEach(function (item) {
+                    let li = document.createElement('li');
+                    ul.appendChild(li);
+                    li.innerHTML += item.username + ' PUNKTY: ' + item.points;
+            });
+            document.querySelector('#next').onclick = false;
         }
     };
 

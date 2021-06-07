@@ -8,7 +8,6 @@ class Game(models.Model):
     room_name = models.CharField(max_length=255, blank=True, null=True)
     question_number = models.IntegerField(default=0)
     started = models.BooleanField(default=False)
-    # todo: metody
 
 
 class Player(models.Model):
@@ -21,7 +20,6 @@ class Player(models.Model):
 
     def __str__(self):
         return self.user.username
-    # todo: metody
 
 
 def post_user_created_signal(sender, instance, created, **kwargs):

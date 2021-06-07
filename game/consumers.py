@@ -172,6 +172,13 @@ class GameConsumer(WebsocketConsumer):
             self.add_point()
 
     def send_random_questions_to_players(self):
+        game = Game.objects.filter(room_name=self.room_name)[0]
+        if game.question_number == 5:
+            return self.send_results()
+
+        game.question_number += 1
+        game.save()
+
         question = Question.objects.all().order_by('?')[:1]
         serializer = RandomQuestionSerializer(question, many=True)
         data = json.dumps(serializer.data)
@@ -180,9 +187,26 @@ class GameConsumer(WebsocketConsumer):
             'data': data
         }
 
-        game = Game.objects.filter(room_name=self.room_name)[0]
-        game.question_number += 1
-        game.save()
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message
+            }
+        )
+
+    def send_results(self):
+        players = Player.objects.filter(game__room_name=self.room_name)
+
+        players_json = []
+        for player in players:
+            players_json.append({'username': player.user.username, 'points': player.points})
+
+        data = json.dumps(players_json)
+        message = {
+            'event': 'show_results',
+            'data': data
+        }
 
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
