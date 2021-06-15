@@ -1,0 +1,20 @@
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+.btn{
+    @apply rounded mt-32 py-4 px-32 uppercase font-bold text-white border border-black bg-gradient-to-t from-yellow-600 to-red-400;
+}
+
+.topic{
+    @apply text-9xl font-bold mt-32 text-gray-800;
+}
+.second_topic{
+    @apply font-bold p-8 text-gray-800;
+}
+
+.login_box{
+    @apply bg-red-600 bg-center border-indigo-600 bg-opacity-75 border-opacity-25;
+}

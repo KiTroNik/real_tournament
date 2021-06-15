@@ -1,36 +1,38 @@
-{% extends "base.html" %} 
- 
+{% extends "base.html" %}
+
 {% block main_content %}
-<div class="row">
-    <div class="col-lg-12">
-        <h3>Register</h3>
+
+<div class="flex h-screen flex-col justify-center items-center bg-gradient-to-tr from-white to-blue-200 bg-opacity-100 rounded-2xl">
+        <h2 class="text-9xl font-bold text-gray-800">Real Tournament</h2>
+        <h3 class="second_topic">The Real game begins</h3>
         <hr>
         <form action="#" method="POST">
             {% csrf_token %}
-            <fieldset>
-                {% for field in form %} {% if field.errors %}
-                <div class="control-group error">
-                    <label class="control-label">{{ field.label }}</label>
-                    <div class="controls">{{ field }}
-                        <span class="help-inline">
-                            {% for error in  field.errors %}{{ error }}{% endfor %}
-                        </span>
+            <div class="px-24 py-12 my-8 bg-blue-600 bg-opacity-50 rounded-lg shadow">
+                <fieldset>
+                    {% for field in form %} {% if field.errors %}
+                    <div class="control-group error">
+                        <label class="control-label">{{ field.label }}</label>
+                        <div class="controls">{{ field }}
+                            <span class="help-inline">
+                                {% for error in  field.errors %}{{ error }}{% endfor %}
+                            </span>
+                        </div>
                     </div>
-                </div>
-                {% else %}
-                <div class="control-group">
-                    <label class="control-label">{{ field.label }}</label>
-                    <div class="controls">{{ field }}
- 
+                    {% else %}
+                    <div class="control-group pb-4">
+                        <label class="control-label">{{ field.label }}</label>
+                        <div class="controls">{{ field }}
+
+                        </div>
                     </div>
+                    {% endif %} {% endfor %}
+                </fieldset>
+                <br>
+                <div>
+                    <button type="submit" class="btn">Submit</button>
                 </div>
-                {% endif %} {% endfor %}
-            </fieldset>
-            <br>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </form>
-    </div>
 </div>
 {% endblock %}

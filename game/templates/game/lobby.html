@@ -2,15 +2,13 @@
 {% load static %}
  
 {% block main_content %}
-<div class="row">
-    <div class="col-lg-12">
-        <h3>Witaj w poczekalni</h3>
-        <p>Liczba graczy: </p>
-        <p id="number_of_players"></p>
+<div class="m-12 flex h-screen flex-col justify-center items-center bg-gradient-to-tr from-white to-blue-200 bg-opacity-100 rounded-2xl">
+        <div class="text-9xl font-bold text-gray-800">Witaj w poczekalni</div>
+        <div class="mt-20 text-2xl font-bold">Liczba graczy: </div>
+        <div id="number_of_players" class="m-4 w-40 h-40 rounded-full bg-indigo-600 bg-opacity-50 p-4 topic text-center"></div>
         {% if request.user.player.is_creator %}
-            <input id="start_game" type="button" value="Start">
+            <input id="start_game" type="button" class="btn mx-96 mb-8" value="Start">
         {% endif %}
-    </div>
 </div>
 
 {{ room_name|json_script:"room-name" }}
